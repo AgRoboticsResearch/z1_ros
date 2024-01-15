@@ -6,6 +6,7 @@ find_package(catkin REQUIRED COMPONENTS
   hardware_interface
   roscpp
   control_msgs
+  sensor_msgs
   actionlib_msgs
   actionlib
   z1_sdk
@@ -20,6 +21,7 @@ catkin_package(
     hardware_interface 
     roscpp 
     control_msgs 
+    sensor_msgs
     actionlib_msgs
     z1_sdk
 )
