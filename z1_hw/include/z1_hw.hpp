@@ -11,6 +11,8 @@
 
 #include <actionlib/server/simple_action_server.h>
 #include <control_msgs/GripperCommandAction.h>
+#include <sensor_msgs/JointState.h>
+#include <ros/publisher.h>
 
 /**
  * @brief This class wraps the functions of unitree-arm-sdk 
@@ -43,6 +45,7 @@ private:
   hardware_interface::PositionJointInterface grip_pos_interface;
   
   bool has_gripper;
+  ros::Publisher joint_command_publisher;
 
   double cmd[6];
   

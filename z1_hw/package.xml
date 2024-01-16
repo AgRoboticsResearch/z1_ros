@@ -13,6 +13,7 @@
   <depend>position_controllers</depend>
   <depend>joint_trajectory_controller</depend>
   <depend>control_msgs</depend>
+  <depend>sensor_msgs</depend>
   <depend>actionlib_msgs</depend>
   <depend>z1_sdk</depend>
 </package>

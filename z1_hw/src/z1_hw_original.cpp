@@ -1,6 +1,4 @@
 #include "z1_hw.hpp"
-#include <sstream>
-
 
 Z1HW::Z1HW(ros::NodeHandle& nh)
 {
@@ -12,7 +10,6 @@ Z1HW::Z1HW(ros::NodeHandle& nh)
   int sdk_own_port, controller_port;
   nh.param<int>("udp/port_to_sdk", controller_port, 8872);
   nh.param<int>("udp_to_controller/own_port", sdk_own_port, 8872);
-  joint_command_publisher = nh.advertise<sensor_msgs::JointState>("/z1_hw_node/joint_commands", 1);
 
   int njoints = has_gripper ? 7 : 6;
   pos = new double[njoints];
@@ -103,34 +100,10 @@ void Z1HW::read(const ros::Time& time, const ros::Duration& period)
 void Z1HW::write(const ros::Time& time, const ros::Duration& period)
 {
   arm->armCmd.mode = (mode_t)UNITREE_ARM_SDK::ArmMode::JointPositionCtrl;
-  std::stringstream ss;
-  ss << "Joints are: ";
+
   for(int i(0); i<6; i++) {
     arm->armCmd.q_d[i] = cmd[i];
-    ss << cmd[i];
-    if (i < 6 - 1)
-    {
-      ss << ", ";
-    }
   }
-  // ROS_INFO("%s", ss.str().c_str());
-
-  // Populate JointState message
-  sensor_msgs::JointState joint_cmd;
-  joint_cmd.header.stamp = time;
-  joint_cmd.name.resize(6);
-  joint_cmd.position.resize(6);
-  joint_cmd.velocity.resize(6);
-  joint_cmd.effort.resize(6);
-
-  // Fill in joint names and values using a for loop
-  for (int i = 0; i < 6; i++) {
-    joint_cmd.name[i] = std::string("joint") + std::to_string(i + 1);  // Generate joint names dynamically
-    joint_cmd.position[i] = cmd[i];
-  }
-
-  // Publish JointState message
-  joint_command_publisher.publish(joint_cmd);
 
   if(has_gripper) {
     arm->armCmd.gripperCmd.angle = gripper_position_cmd;
@@ -138,6 +111,7 @@ void Z1HW::write(const ros::Time& time, const ros::Duration& period)
     arm->armCmd.gripperCmd.epsilon_inner = gripper_epsilon;
     arm->armCmd.gripperCmd.epsilon_outer = gripper_epsilon;
   }
+
   arm->sendRecv();
 }
 
@@ -199,7 +173,7 @@ int main(int argc, char** argv)
   spinner.start();
 
   ros::Time prev_time = ros::Time::now();
-  ros::Rate rate(100.0);
+  ros::Rate rate(300.0);
 
   while(ros::ok())
   {
