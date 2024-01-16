@@ -199,7 +199,7 @@ int main(int argc, char** argv)
   spinner.start();
 
   ros::Time prev_time = ros::Time::now();
-  ros::Rate rate(100.0);
+  ros::Rate rate(30.0);
 
   while(ros::ok())
   {
