@@ -1,4 +1,5 @@
 #include "z1_hw.hpp"
+#include <sstream>
 
 
 Z1HW::Z1HW(ros::NodeHandle& nh)
@@ -102,10 +103,17 @@ void Z1HW::read(const ros::Time& time, const ros::Duration& period)
 void Z1HW::write(const ros::Time& time, const ros::Duration& period)
 {
   arm->armCmd.mode = (mode_t)UNITREE_ARM_SDK::ArmMode::JointPositionCtrl;
-
+  std::stringstream ss;
+  ss << "Joints are: ";
   for(int i(0); i<6; i++) {
     arm->armCmd.q_d[i] = cmd[i];
+    ss << cmd[i];
+    if (i < 6 - 1)
+    {
+      ss << ", ";
+    }
   }
+  // ROS_INFO("%s", ss.str().c_str());
 
   // Populate JointState message
   sensor_msgs::JointState joint_cmd;
@@ -130,7 +138,6 @@ void Z1HW::write(const ros::Time& time, const ros::Duration& period)
     arm->armCmd.gripperCmd.epsilon_inner = gripper_epsilon;
     arm->armCmd.gripperCmd.epsilon_outer = gripper_epsilon;
   }
-
   arm->sendRecv();
 }
 
@@ -192,7 +199,7 @@ int main(int argc, char** argv)
   spinner.start();
 
   ros::Time prev_time = ros::Time::now();
-  ros::Rate rate(300.0);
+  ros::Rate rate(100.0);
 
   while(ros::ok())
   {

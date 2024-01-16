@@ -1,7 +1,3 @@
-joint_state_controller:
-  type:         joint_state_controller/JointStateController
-  publish_rate: 50
-
 z1_joint_traj_controller:
   type: position_controllers/JointTrajectoryController
   joints:
@@ -29,4 +25,14 @@ z1_joint_traj_controller:
       goal: 0.01
     joint6:
       goal: 0.01
+
+z1_joint_group_position_controller:
+  type: position_controllers/JointGroupPositionController
+  joints:
+    - joint1  
+    - joint2  
+    - joint3  
+    - joint4  
+    - joint5  
+    - joint6
   
