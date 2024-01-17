@@ -8,5 +8,6 @@
     <rosparam file="$(find z1_hw)/config/config.yaml"/>
   </node>
 
-
+  <include file="$(find robot_teleoperation)/launch/joy_teleop.launch">
+  </include>
 </launch>

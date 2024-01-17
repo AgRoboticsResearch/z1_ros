@@ -81,7 +81,7 @@ class MoveitServoZ1(object):
         self.joint_acc_states = joint_state_msg.effort
 
     def wait_for_joint_states(self):
-        while self.joint_pos_states == None:
+        while self.joint_pos_states == None and not rospy.is_shutdown():
             rospy.loginfo(rospy.get_name() + " Joint states have not been recieved!")
             self.rate.sleep()
         print("joint states obtained")
@@ -91,10 +91,10 @@ class MoveitServoZ1(object):
         self.wait_for_joint_states()
         while not rospy.is_shutdown():
             # calculate the differential ik and execute the command
-            directions = np.array(self.twist_data + [0]) * 20
+            directions = np.array(self.twist_data + [0])
             # TOOD: scale to the speed limit
             # print("start send")
-            self.z1_arm.cartesianCtrlCmd(directions, 1, 1)
+            self.z1_arm.cartesianCtrlCmd(directions, 0.5, 0.5)
             # print("send command of cartisian")
             self.rate.sleep()
 
