@@ -37,9 +37,10 @@
         <joint name="joint5" value="0"/>
         <joint name="joint6" value="0"/>
     </group_state>
+    
     <!--DISABLE COLLISIONS: By default it is assumed that any link of the robot could potentially come into collision with any other link in the robot. This tag disables collision checking between a specified pair of links. -->
-    <!-- <disable_collisions link1="link_gripper" link2="link03" reason="Never"/>
-    <disable_collisions link1="link_gripper" link2="link04" reason="Never"/> -->
+    <disable_collisions link1="link_gripper" link2="link03" reason="Never"/>
+    <disable_collisions link1="link_gripper" link2="link04" reason="Never"/>
     <disable_collisions link1="link_gripper" link2="link06" reason="Adjacent"/>
 
     <disable_collisions link1="gripperMover" link2="gripperStator" reason="Adjacent"/>
