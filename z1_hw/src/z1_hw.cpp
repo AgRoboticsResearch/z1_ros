@@ -1,8 +1,7 @@
 #include "z1_hw.hpp"
 #include <sstream>
 
-
-Z1HW::Z1HW(ros::NodeHandle& nh)
+Z1HW::Z1HW(ros::NodeHandle &nh)
 {
   /* Setting parameters */
   _nh = &nh;
@@ -36,11 +35,12 @@ Z1HW::Z1HW(ros::NodeHandle& nh)
   jnt_state_interface.registerHandle(state_handle_5);
   hardware_interface::JointStateHandle state_handle_6("joint6", &pos[5], &vel[5], &eff[5]);
   jnt_state_interface.registerHandle(state_handle_6);
-  if(has_gripper) {
+  if (has_gripper)
+  {
     hardware_interface::JointStateHandle state_handle_g("jointGripper", &pos[6], &vel[6], &eff[6]);
     jnt_state_interface.registerHandle(state_handle_g);
   }
-  
+
   registerInterface(&jnt_state_interface);
 
   hardware_interface::JointHandle pos_handle_1(jnt_state_interface.getHandle("joint1"), &cmd[0]);
@@ -57,7 +57,6 @@ Z1HW::Z1HW(ros::NodeHandle& nh)
   arm_pos_interface.registerHandle(pos_handle_6);
 
   registerInterface(&arm_pos_interface);
-  
 
   /* Set UnitreeArm SDK Class */
   gripper_as = new actionlib::SimpleActionServer<control_msgs::GripperCommandAction>("z1_gripper", boost::bind(&Z1HW::gripperCB, this, _1), false);
@@ -71,7 +70,8 @@ void Z1HW::init()
   arm->init();
 
   // get initial pos
-  for(int i(0); i<6; i++) {
+  for (int i(0); i < 6; i++)
+  {
     pos[i] = arm->armState.q[i];
     cmd[i] = pos[i];
   }
@@ -84,15 +84,16 @@ void Z1HW::dinit()
   arm->sendRecv();
 }
 
-void Z1HW::read(const ros::Time& time, const ros::Duration& period)
+void Z1HW::read(const ros::Time &time, const ros::Duration &period)
 {
-  for(int i(0); i<6; i++) {
+  for (int i(0); i < 6; i++)
+  {
     pos[i] = arm->armState.q[i];
     vel[i] = arm->armState.dq[i];
     eff[i] = arm->armState.tau[i];
   }
 
-  if(has_gripper)
+  if (has_gripper)
   {
     pos[6] = arm->armState.gripperState.angle;
     vel[6] = arm->armState.gripperState.speed;
@@ -100,12 +101,13 @@ void Z1HW::read(const ros::Time& time, const ros::Duration& period)
   }
 }
 
-void Z1HW::write(const ros::Time& time, const ros::Duration& period)
+void Z1HW::write(const ros::Time &time, const ros::Duration &period)
 {
   arm->armCmd.mode = (mode_t)UNITREE_ARM_SDK::ArmMode::JointPositionCtrl;
   std::stringstream ss;
   ss << "Joints are: ";
-  for(int i(0); i<6; i++) {
+  for (int i(0); i < 6; i++)
+  {
     arm->armCmd.q_d[i] = cmd[i];
     ss << cmd[i];
     if (i < 6 - 1)
@@ -124,15 +126,17 @@ void Z1HW::write(const ros::Time& time, const ros::Duration& period)
   joint_cmd.effort.resize(6);
 
   // Fill in joint names and values using a for loop
-  for (int i = 0; i < 6; i++) {
-    joint_cmd.name[i] = std::string("joint") + std::to_string(i + 1);  // Generate joint names dynamically
+  for (int i = 0; i < 6; i++)
+  {
+    joint_cmd.name[i] = std::string("joint") + std::to_string(i + 1); // Generate joint names dynamically
     joint_cmd.position[i] = cmd[i];
   }
 
   // Publish JointState message
   joint_command_publisher.publish(joint_cmd);
 
-  if(has_gripper) {
+  if (has_gripper)
+  {
     arm->armCmd.gripperCmd.angle = gripper_position_cmd;
     arm->armCmd.gripperCmd.maxTau = gripper_effort_cmd;
     arm->armCmd.gripperCmd.epsilon_inner = gripper_epsilon;
@@ -141,7 +145,7 @@ void Z1HW::write(const ros::Time& time, const ros::Duration& period)
   arm->sendRecv();
 }
 
-void Z1HW::gripperCB(const control_msgs::GripperCommandGoalConstPtr& msg)
+void Z1HW::gripperCB(const control_msgs::GripperCommandGoalConstPtr &msg)
 {
   gripper_position_cmd = msg->command.position;
   gripper_effort_cmd = msg->command.max_effort;
@@ -156,7 +160,7 @@ void Z1HW::gripperCB(const control_msgs::GripperCommandGoalConstPtr& msg)
     gripper_feedback.reached_goal = arm->armState.gripperState.reached_goal;
     gripper_feedback.stalled = arm->armState.gripperState.stalled;
 
-    if(gripper_as->isPreemptRequested() || !ros::ok() || (timer.wait_time() < 0))
+    if (gripper_as->isPreemptRequested() || !ros::ok() || (timer.wait_time() < 0))
     {
       gripper_result.position = gripper_feedback.position;
       gripper_result.effort = gripper_feedback.effort;
@@ -168,9 +172,9 @@ void Z1HW::gripperCB(const control_msgs::GripperCommandGoalConstPtr& msg)
 
     gripper_as->publishFeedback(gripper_feedback);
 
-    if(std::fabs(gripper_position_cmd - arm->armState.gripperState.angle)<0.01)
+    if (std::fabs(gripper_position_cmd - arm->armState.gripperState.angle) < 0.01)
     {
-      if(gripper_feedback.stalled)
+      if (gripper_feedback.stalled)
       {
         ROS_INFO("[Gripper] Reach goal.");
         gripper_result.position = gripper_feedback.position;
@@ -186,22 +190,22 @@ void Z1HW::gripperCB(const control_msgs::GripperCommandGoalConstPtr& msg)
   }
 }
 
-int main(int argc, char** argv)
+int main(int argc, char **argv)
 {
   ros::init(argc, argv, "z1_ros_controller");
   ros::NodeHandle nh("~");
 
   Z1HW robot(nh);
-  
+
   controller_manager::ControllerManager cm(&robot);
 
   ros::AsyncSpinner spinner(1);
   spinner.start();
 
   ros::Time prev_time = ros::Time::now();
-  ros::Rate rate(30.0);
+  ros::Rate rate(200.0);
 
-  while(ros::ok())
+  while (ros::ok())
   {
     const ros::Time time = ros::Time::now();
     const ros::Duration period = time - prev_time;

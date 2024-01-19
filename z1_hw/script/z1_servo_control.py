@@ -15,7 +15,7 @@ import numpy as np
 
 
 class MoveitServoZ1(object):
-    def __init__(self, rate=30):
+    def __init__(self, rate=100):
         rospy.init_node("z1_servo", anonymous=True, log_level=rospy.INFO)
         self.namespace = rospy.get_namespace()
         self.rate = rospy.Rate(rate)

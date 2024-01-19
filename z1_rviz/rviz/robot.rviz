@@ -1,17 +1,18 @@
 Panels:
   - Class: rviz/Displays
-    Help Height: 138
+    Help Height: 70
     Name: Displays
     Property Tree Widget:
       Expanded:
         - /Global Options1
         - /Status1
         - /RobotModel1/Links1
+        - /TF1
         - /TF1/Frames1
         - /PointCloud21
         - /PointCloud21/Autocompute Value Bounds1
       Splitter Ratio: 0.5
-    Tree Height: 242
+    Tree Height: 352
   - Class: rviz/Selection
     Name: Selection
   - Class: rviz/Tool Properties
@@ -29,7 +30,7 @@ Panels:
   - Class: rviz/Time
     Name: Time
     SyncMode: 0
-    SyncSource: ""
+    SyncSource: PointCloud2
 Preferences:
   PromptSaveOnExit: true
 Toolbars:
@@ -65,16 +66,31 @@ Visualization Manager:
         Expand Link Details: false
         Expand Tree: false
         Link Tree Style: Links in Alphabetic Order
-        gripperMover:
+        camera_depth_frame:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        camera_depth_optical_frame:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        camera_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        camera_realsense:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        camera_realsense_lens:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
-        gripperStator:
+        camera_realsense_link:
           Alpha: 1
           Show Axes: false
           Show Trail: false
-          Value: true
         link00:
           Alpha: 1
           Show Axes: false
@@ -110,6 +126,10 @@ Visualization Manager:
           Show Axes: false
           Show Trail: false
           Value: true
+        realsense_mountpoint:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
         world:
           Alpha: 1
           Show Axes: false
@@ -127,12 +147,20 @@ Visualization Manager:
       Frame Timeout: 15
       Frames:
         All Enabled: false
-        gripperMover:
-          Value: true
-        gripperStator:
-          Value: true
-        link00:
+        camera_depth_frame:
           Value: false
+        camera_depth_optical_frame:
+          Value: false
+        camera_link:
+          Value: false
+        camera_realsense:
+          Value: false
+        camera_realsense_lens:
+          Value: false
+        camera_realsense_link:
+          Value: false
+        link00:
+          Value: true
         link01:
           Value: false
         link02:
@@ -145,6 +173,8 @@ Visualization Manager:
           Value: false
         link06:
           Value: true
+        realsense_mountpoint:
+          Value: false
         world:
           Value: false
       Marker Alpha: 1
@@ -162,9 +192,15 @@ Visualization Manager:
                   link04:
                     link05:
                       link06:
-                        gripperStator:
-                          gripperMover:
-                            {}
+                        realsense_mountpoint:
+                          camera_realsense_lens:
+                            camera_realsense:
+                              camera_link:
+                                camera_depth_frame:
+                                  camera_depth_optical_frame:
+                                    {}
+                              camera_realsense_link:
+                                {}
       Update Interval: 0
       Value: true
     - Acceleration_Scaling_Factor: 1
@@ -198,16 +234,31 @@ Visualization Manager:
           Expand Link Details: false
           Expand Tree: false
           Link Tree Style: Links in Alphabetic Order
-          gripperMover:
+          camera_depth_frame:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          camera_depth_optical_frame:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          camera_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          camera_realsense:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          camera_realsense_lens:
             Alpha: 1
             Show Axes: false
             Show Trail: false
             Value: true
-          gripperStator:
+          camera_realsense_link:
             Alpha: 1
             Show Axes: false
             Show Trail: false
-            Value: true
           link00:
             Alpha: 1
             Show Axes: false
@@ -243,6 +294,10 @@ Visualization Manager:
             Show Axes: false
             Show Trail: false
             Value: true
+          realsense_mountpoint:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
           world:
             Alpha: 1
             Show Axes: false
@@ -293,16 +348,31 @@ Visualization Manager:
           Expand Link Details: false
           Expand Tree: false
           Link Tree Style: Links in Alphabetic Order
-          gripperMover:
+          camera_depth_frame:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          camera_depth_optical_frame:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          camera_link:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          camera_realsense:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
+          camera_realsense_lens:
             Alpha: 1
             Show Axes: false
             Show Trail: false
             Value: true
-          gripperStator:
+          camera_realsense_link:
             Alpha: 1
             Show Axes: false
             Show Trail: false
-            Value: true
           link00:
             Alpha: 1
             Show Axes: false
@@ -338,6 +408,10 @@ Visualization Manager:
             Show Axes: false
             Show Trail: false
             Value: true
+          realsense_mountpoint:
+            Alpha: 1
+            Show Axes: false
+            Show Trail: false
           world:
             Alpha: 1
             Show Axes: false
@@ -348,7 +422,7 @@ Visualization Manager:
       Value: true
       Velocity_Scaling_Factor: 1
     - Class: rviz/Image
-      Enabled: true
+      Enabled: false
       Image Topic: /camera/color/image_rect_color
       Max Value: 1
       Median window: 5
@@ -358,7 +432,7 @@ Visualization Manager:
       Queue Size: 2
       Transport Hint: raw
       Unreliable: false
-      Value: true
+      Value: false
     - Alpha: 1
       Autocompute Intensity Bounds: true
       Autocompute Value Bounds:
@@ -397,16 +471,31 @@ Visualization Manager:
         Expand Link Details: false
         Expand Tree: false
         Link Tree Style: Links in Alphabetic Order
-        gripperMover:
+        camera_depth_frame:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        camera_depth_optical_frame:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        camera_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        camera_realsense:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        camera_realsense_lens:
           Alpha: 1
           Show Axes: false
           Show Trail: false
           Value: true
-        gripperStator:
+        camera_realsense_link:
           Alpha: 1
           Show Axes: false
           Show Trail: false
-          Value: true
         link00:
           Alpha: 1
           Show Axes: false
@@ -442,6 +531,10 @@ Visualization Manager:
           Show Axes: false
           Show Trail: false
           Value: true
+        realsense_mountpoint:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
         world:
           Alpha: 1
           Show Axes: false
@@ -487,7 +580,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 1.889465570449829
+      Distance: 1.809010624885559
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -495,31 +588,31 @@ Visualization Manager:
         Value: false
       Field of View: 0.7853981852531433
       Focal Point:
-        X: 0.33993348479270935
-        Y: 0.014712000265717506
-        Z: 0.2976108193397522
+        X: 0.2871081829071045
+        Y: -0.0017729522660374641
+        Z: 0.28866714239120483
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.28539881110191345
+      Pitch: -0.0046011703088879585
       Target Frame: <Fixed Frame>
-      Yaw: 1.925400972366333
+      Yaw: 1.4904013872146606
     Saved: ~
 Window Geometry:
   Displays:
     collapsed: false
-  Height: 1472
+  Height: 1376
   Hide Left Dock: false
-  Hide Right Dock: false
+  Hide Right Dock: true
   Image:
-    collapsed: false
+    collapsed: true
   MotionPlanning:
     collapsed: false
   MotionPlanning - Trajectory Slider:
     collapsed: false
-  QMainWindow State: 000000ff00000000fd0000000400000000000003a3000004bafc020000000dfb0000001200530065006c0065006300740069006f006e00000001e10000009b000000b000fffffffb0000001e0054006f006f006c002000500072006f007000650072007400690065007302000001ed000001df00000185000000b0fb000000120056006900650077007300200054006f006f02000001df000002110000018500000122fb000000200054006f006f006c002000500072006f0070006500720074006900650073003203000002880000011d000002210000017afb000000100044006900730070006c006100790073010000006e000001ea0000018200fffffffb0000001c004d006f00740069006f006e0050006c0061006e006e0069006e00670100000264000002c4000002b800fffffffb0000002000730065006c0065006300740069006f006e00200062007500660066006500720200000138000000aa0000023a00000294fb00000014005700690064006500530074006500720065006f02000000e6000000d2000003ee0000030bfb0000000c004b0069006e0065006300740200000186000001060000030c00000261fb000000280020002d0020005400720061006a006500630074006f0072007900200053006c00690064006500720000000000ffffffff0000000000000000fb00000044004d006f00740069006f006e0050006c0061006e006e0069006e00670020002d0020005400720061006a006500630074006f0072007900200053006c00690064006500720000000000ffffffff0000002600000026fb000000280020002d0020005400720061006a006500630074006f0072007900200053006c00690064006500720000000000ffffffff0000000000000000fb0000003c005400720061006a006500630074006f007200790020002d0020005400720061006a006500630074006f0072007900200053006c00690064006500720000000000ffffffff000000260000002600000001000003a3000004bafc0200000003fb0000001e0054006f006f006c002000500072006f00700065007200740069006500730100000041000000780000000000000000fc0000006e000004ba0000016c01000039fa000000000100000003fb0000000a0049006d0061006700650100000000ffffffff0000009100fffffffb0000000a0049006d0061006700650000000000ffffffff0000000000000000fb0000000a0056006900650077007301000008b10000014f0000015f00fffffffb0000001200530065006c0065006300740069006f006e010000025a000000b200000000000000000000000200000490000000a9fc0100000001fb0000000a00560069006500770073030000004e00000080000002e1000001970000000300000a000000005efc0100000002fb0000000800540069006d0065010000000000000a00000006dc00fffffffb0000000800540069006d00650100000000000004500000000000000000000002a2000004ba00000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
+  QMainWindow State: 000000ff00000000fd000000040000000000000258000004a2fc020000000dfb0000001200530065006c0065006300740069006f006e00000001e10000009b0000005c00fffffffb0000001e0054006f006f006c002000500072006f007000650072007400690065007302000001ed000001df00000185000000b0fb000000120056006900650077007300200054006f006f02000001df000002110000018500000122fb000000200054006f006f006c002000500072006f0070006500720074006900650073003203000002880000011d000002210000017afb000000100044006900730070006c006100790073010000003d000001e3000000c900fffffffb0000001c004d006f00740069006f006e0050006c0061006e006e0069006e00670100000226000002b90000017d00fffffffb0000002000730065006c0065006300740069006f006e00200062007500660066006500720200000138000000aa0000023a00000294fb00000014005700690064006500530074006500720065006f02000000e6000000d2000003ee0000030bfb0000000c004b0069006e0065006300740200000186000001060000030c00000261fb000000280020002d0020005400720061006a006500630074006f0072007900200053006c00690064006500720000000000ffffffff0000000000000000fb00000044004d006f00740069006f006e0050006c0061006e006e0069006e00670020002d0020005400720061006a006500630074006f0072007900200053006c00690064006500720000000000ffffffff0000001600000016fb000000280020002d0020005400720061006a006500630074006f0072007900200053006c00690064006500720000000000ffffffff0000000000000000fb0000003c005400720061006a006500630074006f007200790020002d0020005400720061006a006500630074006f0072007900200053006c00690064006500720000000000ffffffff00000016000000160000000100000258000004a2fc0200000003fb0000001e0054006f006f006c002000500072006f00700065007200740069006500730100000041000000780000000000000000fc0000003d000004a20000000000fffffffa000000010100000003fb0000000a0049006d0061006700650000000000ffffffff0000005e00fffffffb0000000a0049006d0061006700650000000000ffffffff0000000000000000fb0000000a0056006900650077007300000008b10000014f0000010000fffffffb0000001200530065006c0065006300740069006f006e010000025a000000b200000000000000000000000200000490000000a9fc0100000001fb0000000a00560069006500770073030000004e00000080000002e10000019700000003000004dc0000005efc0100000002fb0000000800540069006d00650100000000000004dc000003bc00fffffffb0000000800540069006d006501000000000000045000000000000000000000027e000004a200000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
   Selection:
     collapsed: false
   Time:
@@ -529,7 +622,7 @@ Window Geometry:
   Trajectory - Trajectory Slider:
     collapsed: false
   Views:
-    collapsed: false
-  Width: 2560
-  X: 144
-  Y: 54
+    collapsed: true
+  Width: 1244
+  X: 72
+  Y: 27

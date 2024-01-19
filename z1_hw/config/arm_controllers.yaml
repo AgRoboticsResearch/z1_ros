@@ -8,8 +8,8 @@ z1_joint_traj_controller:
     - joint5  
     - joint6
   stop_trajectory_duration: 0.5
-  state_publish_rate: 25
-  action_monitor_rate: 10
+  state_publish_rate: 200
+  action_monitor_rate: 200
 
   constraints:
     goal_time: 0.5
