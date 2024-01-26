@@ -121,16 +121,21 @@ void Z1HW::write(const ros::Time& time, const ros::Duration& period)
 {
   arm->armCmd.mode = (mode_t)UNITREE_ARM_SDK::ArmMode::JointPositionCtrl;
   double cmd_use[6];
-  
+  sensor_msgs::JointState joint_cmd;
+
   if (this->use_topic_commands){
       for(int i(0); i<6; i++) {
         cmd_use[i] = direct_joints_cmd[i];
+        joint_cmd.header.frame_id = "direct_joint_commands";
+
       }
   }
   else{
      for(int i(0); i<6; i++) {
       cmd_use[i] = cmd[i];
       direct_joints_cmd[i] = cmd[i];
+      joint_cmd.header.frame_id = "move_group";
+
     }
   }
 
@@ -138,6 +143,7 @@ void Z1HW::write(const ros::Time& time, const ros::Duration& period)
   ss << "Joints are: ";
   for(int i(0); i<6; i++) {
     arm->armCmd.q_d[i] = cmd_use[i];
+    
     ss << cmd_use[i];
     if (i < 6 - 1)
     {
@@ -145,16 +151,6 @@ void Z1HW::write(const ros::Time& time, const ros::Duration& period)
     }
   }
   // ROS_INFO("%s", ss.str().c_str());
-
-  // Populate JointState message
-  sensor_msgs::JointState joint_cmd;
-  if (this->use_topic_commands){
-    joint_cmd.header.frame_id = "direct_joint_commands";
-  }
-  else{
-    joint_cmd.header.frame_id = "move_group";
-
-  }
   joint_cmd.header.stamp = time;
   joint_cmd.name.resize(6);
   joint_cmd.position.resize(6);
