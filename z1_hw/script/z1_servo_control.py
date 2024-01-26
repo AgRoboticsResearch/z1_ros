@@ -15,7 +15,7 @@ import numpy as np
 
 
 class MoveitServoZ1(object):
-    def __init__(self, rate=100):
+    def __init__(self, rate=500):
         rospy.init_node("z1_servo", anonymous=True, log_level=rospy.INFO)
         self.namespace = rospy.get_namespace()
         self.rate = rospy.Rate(rate)
@@ -56,7 +56,7 @@ class MoveitServoZ1(object):
             self.twist_cmd_callback,
         )
 
-        joint_state_command_topic = "/z1_gazebo/joint_states"
+        joint_state_command_topic = "/joint_states"
         rospy.Subscriber(
             joint_state_command_topic,
             JointState,

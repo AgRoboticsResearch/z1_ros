@@ -12,6 +12,8 @@ Z1HW::Z1HW(ros::NodeHandle &nh)
   nh.param<int>("udp/port_to_sdk", controller_port, 8872);
   nh.param<int>("udp_to_controller/own_port", sdk_own_port, 8872);
   joint_command_publisher = nh.advertise<sensor_msgs::JointState>("/z1_hw_node/joint_commands", 1);
+  joint_commands_subscriber = nh.subscribe("/z1_hw_node/direct_joint_commands", 1, &Z1HW::jointCommandsCallback, this);
+  switch_cmd_source_service = nh.advertiseService("/z1_hw_node/switch_cmd_source", &Z1HW::switchCommandSourceCallback, this);
 
   int njoints = has_gripper ? 7 : 6;
   pos = new double[njoints];
@@ -63,6 +65,23 @@ Z1HW::Z1HW(ros::NodeHandle &nh)
   gripper_as->start();
 }
 
+void Z1HW::jointCommandsCallback(const sensor_msgs::JointState::ConstPtr &msg)
+{
+  // Access and process joint commands from the message
+  for (int i = 0; i < msg->position.size(); i++)
+  {
+    direct_joints_cmd[i] = msg->position[i];
+  }
+}
+
+bool Z1HW::switchCommandSourceCallback(std_srvs::SetBool::Request &req, std_srvs::SetBool::Response &res)
+{
+  use_topic_commands = req.data; // Store the desired source
+  res.success = true;
+  ROS_INFO_STREAM("Received switchCommandSource, direct topic control: " << req.data);
+  return true;
+}
+
 void Z1HW::init()
 {
   ROS_INFO("Unitree Arm Initializing...");
@@ -74,6 +93,7 @@ void Z1HW::init()
   {
     pos[i] = arm->armState.q[i];
     cmd[i] = pos[i];
+    direct_joints_cmd[i] = pos[i];
   }
   gripper_position_cmd = arm->armState.gripperState.angle;
 }
@@ -104,12 +124,30 @@ void Z1HW::read(const ros::Time &time, const ros::Duration &period)
 void Z1HW::write(const ros::Time &time, const ros::Duration &period)
 {
   arm->armCmd.mode = (mode_t)UNITREE_ARM_SDK::ArmMode::JointPositionCtrl;
+  double cmd_use[6];
+
+  if (this->use_topic_commands)
+  {
+    for (int i(0); i < 6; i++)
+    {
+      cmd_use[i] = direct_joints_cmd[i];
+    }
+  }
+  else
+  {
+    for (int i(0); i < 6; i++)
+    {
+      cmd_use[i] = cmd[i];
+      direct_joints_cmd[i] = cmd[i];
+    }
+  }
+
   std::stringstream ss;
   ss << "Joints are: ";
   for (int i(0); i < 6; i++)
   {
-    arm->armCmd.q_d[i] = cmd[i];
-    ss << cmd[i];
+    arm->armCmd.q_d[i] = cmd_use[i];
+    ss << cmd_use[i];
     if (i < 6 - 1)
     {
       ss << ", ";
@@ -119,6 +157,14 @@ void Z1HW::write(const ros::Time &time, const ros::Duration &period)
 
   // Populate JointState message
   sensor_msgs::JointState joint_cmd;
+  if (this->use_topic_commands)
+  {
+    joint_cmd.header.frame_id = "direct_joint_commands";
+  }
+  else
+  {
+    joint_cmd.header.frame_id = "move_group";
+  }
   joint_cmd.header.stamp = time;
   joint_cmd.name.resize(6);
   joint_cmd.position.resize(6);
@@ -129,7 +175,7 @@ void Z1HW::write(const ros::Time &time, const ros::Duration &period)
   for (int i = 0; i < 6; i++)
   {
     joint_cmd.name[i] = std::string("joint") + std::to_string(i + 1); // Generate joint names dynamically
-    joint_cmd.position[i] = cmd[i];
+    joint_cmd.position[i] = cmd_use[i];
   }
 
   // Publish JointState message

@@ -1,13 +1,23 @@
 <launch>
   <arg name="UnitreeGripper" default="true"/>
-
+  <arg name="space_nav" default="true"/>
 
   <node type="z1_servo_control.py" pkg="z1_hw" name="z1_servo_control" output="screen" respawn="true">
     <param name="UnitreeGripperYN" value="$(arg UnitreeGripper)"/>
     <rosparam file="$(find z1_controller)/config/config.yaml"/>
     <rosparam file="$(find z1_hw)/config/config.yaml"/>
+    <remap from="/joint_states" to="/z1_gazebo/joint_states"/>
   </node>
 
-  <include file="$(find robot_teleoperation)/launch/joy_teleop.launch">
-  </include>
+  <group if="$(arg space_nav)">
+      <include file="$(find spacenav_node)/launch/static_deadband.launch"/>
+      <node name="spacenav_to_twist" pkg="moveit_servo" type="spacenav_to_twist" output="screen">
+      </node>
+  </group>
+
+  <group unless="$(arg space_nav)">
+      <include file="$(find robot_teleoperation)/launch/joy_teleop.launch"/>
+  </group>
+
+  
 </launch>

@@ -13,6 +13,8 @@
 #include <control_msgs/GripperCommandAction.h>
 #include <sensor_msgs/JointState.h>
 #include <ros/publisher.h>
+#include <std_srvs/SetBool.h>
+#include <ros/console.h>
 
 /**
  * @brief This class wraps the functions of unitree-arm-sdk 
@@ -38,6 +40,8 @@ public:
   void write(const ros::Time& time, const ros::Duration& period) override;
   
   void gripperCB(const control_msgs::GripperCommandGoalConstPtr& msg);
+  void jointCommandsCallback(const sensor_msgs::JointState::ConstPtr& msg);
+  bool switchCommandSourceCallback(std_srvs::SetBool::Request& req, std_srvs::SetBool::Response& res);
 
 private:
   hardware_interface::JointStateInterface jnt_state_interface;
@@ -45,10 +49,13 @@ private:
   hardware_interface::PositionJointInterface grip_pos_interface;
   
   bool has_gripper;
+  bool use_topic_commands;
   ros::Publisher joint_command_publisher;
-
+  ros::Subscriber joint_commands_subscriber;
+  ros::ServiceServer switch_cmd_source_service; 
   double cmd[6];
-  
+  double direct_joints_cmd[6];
+
   double* pos;
   double* vel;
   double* eff;
