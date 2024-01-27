@@ -18,12 +18,13 @@
     <rosparam file="$(find z1_hw)/config/config.yaml"/>
   </node>
 
-    <!-- start this controller -->
+    <!-- start the joint trajectory controller -->
   <rosparam file="$(find z1_hw)/config/arm_controllers.yaml" command="load"/>
   <node name="arm_controller_spawner" pkg="controller_manager" type="controller_manager" 
         args="spawn z1_joint_traj_controller" respawn="false" output="screen"/>
 
-  <!-- load other controllers -->
+  <!-- load the joint position controllers -->
   <node name="ros_control_controller_manager" pkg="controller_manager" type="controller_manager" 
         respawn="false" output="screen" args="load z1_joint_group_position_controller" />
+
 </launch>
