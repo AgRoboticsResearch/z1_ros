@@ -35,3 +35,4 @@ target_link_libraries(z1_ctrl
   UnitreeArm_${CMAKE_SYSTEM_PROCESSOR}
   pinocchio::pinocchio
 )
+add_dependencies(z1_ctrl ${catkin_EXPORTED_TARGETS})
