@@ -1,6 +1,7 @@
 <launch>
   <arg name="UnitreeGripperYN" default="true"/>
   <arg name="RealSense" default="true"/>
+  <arg name="HitbotGripper" default="true"/>
 
   <arg name="controller" default="true" />
   <arg name="ros_controller" default="true" />
@@ -9,7 +10,8 @@
 
   <include file="$(find z1_bringup)/launch/sim_ctrl.launch" if="$(arg controller)">
     <arg name="UnitreeGripperYN" value="$(arg UnitreeGripperYN)"/>
-    <!-- <arg name="RealSense" value="$(arg RealSense)"/> -->
+    <arg name="RealSense" value="$(arg RealSense)"/>
+    <arg name="HitbotGripper" value="$(arg HitbotGripper)"/>
   </include>
 
   <group if="$(arg RealSense)">
