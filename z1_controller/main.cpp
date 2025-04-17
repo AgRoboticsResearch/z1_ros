@@ -73,6 +73,7 @@ int main(int argc, char **argv){
                 << "Unitree Gripper.\n";
       break;
     }
+    usleep(100000);
   }
 
   if(!ctrlComp->ioInter->initialized()) {

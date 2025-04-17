@@ -24,10 +24,15 @@ sudo apt install -y ros-noetic-joint-trajectory-controller ros-noetic-trac-ik-ki
 + [pinocchio](https://stack-of-tasks.github.io/pinocchio/download.html)
 
 If you want to install python interface, please check the offical page.
+
+
 ```
 # Install pinocchio
 git clone --recursive https://github.com/stack-of-tasks/pinocchio
-cd pinocchio && mkdir build && cd build
+cd pinocchio
+# Attention: This program is not compatible with pinocchio from version V3.0.0 onwards.
+git checkout v2.7.0
+mkdir build && cd build
 cmake .. \
   -DCMAKE_BUILD_TYPE=Release \
   -DCMAKE_INSTALL_PREFIX=/usr/local \
