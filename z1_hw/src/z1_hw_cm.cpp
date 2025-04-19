@@ -100,14 +100,14 @@ void Z1HW::read(const ros::Time& time, const ros::Duration& period)
 void Z1HW::write(const ros::Time& time, const ros::Duration& period)
 {
   // Print current arm mode before setting it
-  ROS_INFO("Current arm mode: %d", (int)arm->armState.mode);
+  // ROS_INFO("Current arm mode: %d", (int)arm->armState.mode);
   
   arm->armCmd.mode = (mode_t)UNITREE_ARM_SDK::ArmMode::JointPositionCtrl;
 
   for(int i(0); i<6; i++) {
     arm->armCmd.q_d[i] = cmd[i];
     // print cmd for debug
-    ROS_INFO("cmd[%d]: %f", i, cmd[i]);
+    // ROS_INFO("cmd[%d]: %f", i, cmd[i]);
 
   }
 
