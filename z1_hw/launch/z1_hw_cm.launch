@@ -4,7 +4,9 @@
   <rosparam file="$(find z1_hw)/config/joint_state_controller.yaml" command="load"/>
   <node name="joint_state_controller_spawner" pkg="controller_manager" type="controller_manager" args="spawn joint_state_controller" respawn="false" output="screen"/>
 
-  <node type="z1_hw_cm_node" pkg="z1_hw" name="z1_hw_cm_node" output="screen" respawn="true">
+  <!-- Add a delay parameter to ensure z1_controller is fully initialized -->
+  <arg name="startup_delay" default="3.0" />
+  <node type="z1_hw_cm_node" pkg="z1_hw" name="z1_hw_cm_node" output="screen" respawn="true" launch-prefix="bash -c 'sleep $(arg startup_delay); $0 $@'">
     <param name="UnitreeGripperYN" value="false"/>
     <rosparam file="$(find z1_controller)/config/config.yaml"/>
     <rosparam file="$(find z1_hw)/config/config.yaml"/>

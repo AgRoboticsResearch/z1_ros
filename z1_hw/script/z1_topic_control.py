@@ -3,8 +3,11 @@
 
 import rospy
 import time
+import actionlib
 from std_msgs.msg import Float64MultiArray
 from sensor_msgs.msg import JointState
+from trajectory_msgs.msg import JointTrajectory, JointTrajectoryPoint
+from control_msgs.msg import FollowJointTrajectoryAction, FollowJointTrajectoryGoal
 from controller_manager_msgs.srv import SwitchController, ListControllers, SwitchControllerRequest
 
 class Z1TopicControl:
@@ -23,14 +26,25 @@ class Z1TopicControl:
             rospy.logerr(f"Controller manager services not found: {e}")
             raise
             
-        # Make sure the position controller is active
-        self.ensure_position_controller_running()
+        # Make sure the trajectory controller is active
+        self.ensure_trajectory_controller_running()
         
         # Subscribe to joint commands topic (using JointState for better semantics)
         self.joint_commands_sub = rospy.Subscriber('/joint_commands', JointState, self.joint_commands_callback, queue_size=1)
         
-        # Create publishers for joint position controller
-        self.joint_position_pub = rospy.Publisher('/z1_joint_group_position_controller/command', Float64MultiArray, queue_size=1)
+        # Create action client for trajectory controller
+        self.trajectory_client = actionlib.SimpleActionClient(
+            '/z1_joint_traj_controller/follow_joint_trajectory',
+            FollowJointTrajectoryAction
+        )
+        
+        # Wait for the action server to be available
+        rospy.loginfo("Waiting for trajectory action server...")
+        server_exists = self.trajectory_client.wait_for_server(timeout=rospy.Duration(10.0))
+        if not server_exists:
+            rospy.logwarn("Trajectory action server not available after waiting. Commands may fail.")
+        else:
+            rospy.loginfo("Trajectory action server connected!")
         
         # Subscribe to joint states to monitor current robot state
         self.joint_states_sub = rospy.Subscriber('/joint_states', JointState, self.joint_states_callback, queue_size=1)
@@ -41,9 +55,9 @@ class Z1TopicControl:
         
         rospy.loginfo("Z1 Topic Control node started")
 
-    def ensure_position_controller_running(self):
+    def ensure_trajectory_controller_running(self):
         """
-        Make sure that the position controller is running and the trajectory controller is stopped
+        Make sure that the trajectory controller is running and the position controller is stopped
         to avoid resource conflict between controllers
         """
         try:
@@ -58,17 +72,17 @@ class Z1TopicControl:
                 if controller.name == "z1_joint_group_position_controller" and controller.state == "running":
                     pos_controller_running = True
             
-            # If position controller is already running, we're done
-            if pos_controller_running:
-                rospy.loginfo("Position controller is already running")
+            # If trajectory controller is already running, we're done
+            if traj_controller_running:
+                rospy.loginfo("Trajectory controller is already running")
                 return True
                 
-            # If trajectory controller is running, we need to stop it and start position controller
-            if traj_controller_running:
-                rospy.loginfo("Stopping trajectory controller and starting position controller...")
+            # If position controller is running, we need to stop it and start trajectory controller
+            if pos_controller_running:
+                rospy.loginfo("Stopping position controller and starting trajectory controller...")
                 result = self.switch_controller(
-                    start_controllers=['z1_joint_group_position_controller'],
-                    stop_controllers=['z1_joint_traj_controller'],
+                    start_controllers=['z1_joint_traj_controller'],
+                    stop_controllers=['z1_joint_group_position_controller'],
                     strictness=SwitchControllerRequest.STRICT,
                     start_asap=True,
                     timeout=5.0
@@ -83,9 +97,9 @@ class Z1TopicControl:
                     rospy.logerr("Failed to switch controllers!")
                     return False
             else:
-                # Just start the position controller
+                # Just start the trajectory controller
                 result = self.switch_controller(
-                    start_controllers=['z1_joint_group_position_controller'],
+                    start_controllers=['z1_joint_traj_controller'],
                     stop_controllers=[],
                     strictness=SwitchControllerRequest.STRICT,
                     start_asap=True,
@@ -93,11 +107,11 @@ class Z1TopicControl:
                 )
                 
                 if result.ok:
-                    rospy.loginfo("Successfully started position controller!")
+                    rospy.loginfo("Successfully started trajectory controller!")
                     rospy.sleep(0.5)
                     return True
                 else:
-                    rospy.logerr("Failed to start position controller!")
+                    rospy.logerr("Failed to start trajectory controller!")
                     return False
                 
         except Exception as e:
@@ -108,6 +122,7 @@ class Z1TopicControl:
         """
         Handle incoming joint commands.
         Expects JointState message with positions for the 6 joints.
+        Sends a trajectory to the trajectory controller for smooth motion.
         """
         # Extract joint positions in the correct order for the controller
         command_positions = [0.0] * 6
@@ -123,13 +138,35 @@ class Z1TopicControl:
         # Check if we have enough joints
         if found_joints < 6:
             rospy.logwarn("Received joint command with insufficient number of recognized joints. Expected 6, got %d", found_joints)
+            return
+            
+        # Create a trajectory goal
+        goal = FollowJointTrajectoryGoal()
+        goal.trajectory = JointTrajectory()
+        goal.trajectory.joint_names = self.joint_names
         
-        # Forward the commands to position controller
-        command_msg = Float64MultiArray()
-        command_msg.data = command_positions
-        self.joint_position_pub.publish(command_msg)
+        # Create a trajectory point with time from start and positions
+        point = JointTrajectoryPoint()
+        point.positions = command_positions
         
-        rospy.loginfo("Sent joint commands: %s", str(command_positions))
+        # Calculate a reasonable time to reach the target based on the distance
+        max_distance = 0
+        for i in range(6):
+            distance = abs(command_positions[i] - self.current_joint_positions[i])
+            if distance > max_distance:
+                max_distance = distance
+        
+        # Assign a time proportional to the maximum distance to move (1 second per radian, with a minimum of 0.5 seconds)
+        move_time = max(0.5, max_distance * 1.0)
+        point.time_from_start = rospy.Duration(move_time)
+        
+        # Add the point to the trajectory
+        goal.trajectory.points.append(point)
+        
+        # Send the trajectory to the controller
+        self.trajectory_client.send_goal(goal)
+        
+        rospy.loginfo("Sent joint trajectory command: %s (ETA: %.2f seconds)", str(command_positions), move_time)
 
     def joint_states_callback(self, msg):
         """
