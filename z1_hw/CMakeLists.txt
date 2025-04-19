@@ -36,3 +36,7 @@ include_directories(
 
 add_executable(${PROJECT_NAME}_node src/z1_hw.cpp)
 target_link_libraries(${PROJECT_NAME}_node ${catkin_LIBRARIES} ${z1_sdk_LIBRARIES})
+
+
+add_executable(${PROJECT_NAME}_cm_node src/z1_hw_cm.cpp)
+target_link_libraries(${PROJECT_NAME}_cm_node ${catkin_LIBRARIES} ${z1_sdk_LIBRARIES})

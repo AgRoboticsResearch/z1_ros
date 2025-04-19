@@ -1,0 +1,34 @@
+<launch>
+  <arg name="UnitreeGripperYN" default="False"/>
+  <arg name="RealSense" default="False"/>
+  <arg name="HitbotGripper" default="False"/>
+
+  <arg name="controller" default="true" />
+  <arg name="ros_controller" default="true" />
+  <arg name="moveit" default="true" />
+  <arg name="rviz" default="true" />
+
+  
+
+  <include file="$(find z1_bringup)/launch/sim_ctrl.launch" if="$(arg controller)">
+    <arg name="UnitreeGripperYN" value="$(arg UnitreeGripperYN)"/>
+    <arg name="RealSense" value="$(arg RealSense)"/>
+    <arg name="HitbotGripper" value="$(arg HitbotGripper)"/>
+  </include>
+
+  <group if="$(arg RealSense)">
+      <node name="image_proc" pkg="image_proc" type="image_proc" ns="camera/color"/>
+  </group>
+
+  <group if="$(arg ros_controller)">
+    <include file="$(find z1_hw)/launch/z1_hw_cm.launch">
+    </include>
+  </group>
+
+  <include file="$(find z1_moveit_config)/launch/move_group.launch" if="$(arg moveit)"/>
+
+  <include file="$(find z1_rviz)/launch/view_robot.launch" if="$(arg rviz)"/>
+
+
+
+</launch>
