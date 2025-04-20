@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# filepath: /home/zfei/codes/z1/ws/src/z1_ros/z1_hw/script/z1_topic_control_fixed.py
 
 import rospy
 import time
