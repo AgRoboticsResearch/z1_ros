@@ -41,6 +41,9 @@ int main(int argc, char **argv){
   double collisionLimitT;
   nh.param<double>("collision/limitT", collisionLimitT, 10.0);
   collisionLimitT = clamp(collisionLimitT, 5, 30);
+  ROS_INFO("[Collision] open: %s, limitT: %.2f",
+           collisionOpen ? "true" : "false", collisionLimitT);
+
   // 3. control method
   std::string communication;
   nh.param<std::string>("communication", communication, "UDP");
